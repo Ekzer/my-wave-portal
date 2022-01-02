@@ -8,6 +8,8 @@ This project demonstrates a simple full stack Web3 project with SmartContract cr
 
 Stack: NodeJS/Hardhat/Ethers/Solidity/ReactJs/MetaMask
 
+First, edit hardhat.config.js by adding your network configuration
+
 Try running some of the following tasks:
 
 ```shell
