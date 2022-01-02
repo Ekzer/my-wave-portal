@@ -10,3 +10,4 @@ artifacts
 web3.excalidraw
 .idea
 package-lock.json
+hardhat.config.js
