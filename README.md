@@ -1,15 +1,20 @@
-# Basic Sample Hardhat Project
+# My Wave Portal 👋
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+Send a wave on Ethereum Rinkeby TestNet blockchain ! https://my-wave-portal.ekzer.repl.co/ (You'll need ETH to let a message
+
+Project from https://buildspace.co - Huge thanks to them !
+
+This project demonstrates a simple full stack Web3 project with SmartContract creation, deployment, interaction via Front-End/MetaMask
+
+Stack: NodeJS/Hardhat/Ethers/Solidity/ReactJs/MetaMask
+
+First, edit hardhat.config.js by adding your network configuration
 
 Try running some of the following tasks:
 
 ```shell
-npx hardhat accounts
+npm install
 npx hardhat compile
 npx hardhat clean
 npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
 ```
