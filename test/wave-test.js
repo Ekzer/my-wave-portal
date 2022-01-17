@@ -2,14 +2,24 @@ const {expect} = require("chai");
 const {ethers} = require("hardhat");
 
 describe("WavePortal Contract", () => {
-    let waveContract;
+    let waveContract, randomNumberGeneratorContract, registryContract;
     let previousContractBalance, previousOwnerBalance;
     before(async() => {
         const wavePortalContract = await ethers.getContractFactory("WavePortal");
-        waveContract = await wavePortalContract.deploy({
+        const randomNumberContract = await ethers.getContractFactory("RandomNumberGenerator");
+        const registry = await ethers.getContractFactory("Registry");
+        registryContract = await registry.deploy();
+        await registryContract.deployed();
+
+        waveContract = await wavePortalContract.deploy(registryContract.address, {
             value: ethers.utils.parseEther("1")
         });
         await waveContract.deployed();
+        randomNumberGeneratorContract = await randomNumberContract.deploy(registryContract.address, {
+            value: ethers.utils.parseEther("1")
+        })
+        await randomNumberGeneratorContract.deployed();
+        
         const contractBalance = await ethers.provider.getBalance(waveContract.address);
         expect(contractBalance).to.eql(ethers.utils.parseEther("1"));
         previousContractBalance = contractBalance;
@@ -19,6 +29,7 @@ describe("WavePortal Contract", () => {
         const [owner] = await ethers.getSigners();
         const ownerBalance = await ethers.provider.getBalance(owner.address);
         console.log("WavePortal Smart Contract deployed to :" + waveContract.address);
+        console.log("RandomNumberGenerator Smart Contract deployed to :" + randomNumberGeneratorContract.address);
         console.log("WavePortal Smart Contract deployed by :" + owner.address);
         console.log("Owner balance :" + ownerBalance);
 
@@ -37,11 +48,11 @@ describe("WavePortal Contract", () => {
 
     it("WavePortal balance should decrease and owner balance should increase", async () => {
         const [owner] = await ethers.getSigners();
-        console.log(owner.address); 
         const ownerBalance = await ethers.provider.getBalance(owner.address).then((value) => ethers.utils.formatEther(value));
         const contractBalance = await ethers.provider.getBalance(waveContract.address).then((value) => ethers.utils.formatEther(value));
         console.log("ownerBalance: " + ownerBalance);
         console.log("contractBalance: " + contractBalance);
+
         expect(contractBalance).to.eq(ethers.utils.formatEther(previousContractBalance.sub(ethers.utils.parseEther("0.0001"))));
         //expect(ownerBalance).to.eq(ethers.utils.formatEther(previousOwnerBalance.add(ethers.utils.parseEther("0.0001")))); doesn't work? why? On deployed contract, we txns of funding
     })
@@ -49,7 +60,7 @@ describe("WavePortal Contract", () => {
     it("Wave from other people should be stored and emit newWave event", async() => {
         const [_, randomPerson] = await ethers.getSigners();
         const message = "Hello World 2";
-        const waveRandomPersonTxn = await waveContract.wave(message);
+        const waveRandomPersonTxn = await waveContract.connect(randomPerson).wave(message);
         const receipt = await waveRandomPersonTxn.wait();
         const newWaveEvent = receipt.events.find(event => event.event === "NewWave");
         expect(newWaveEvent).to.exist;
